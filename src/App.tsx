@@ -18,6 +18,7 @@ import { LatestNewsView } from './components/LatestNewsView';
 import { WordPressAdminDashboard } from './components/WordPressAdminDashboard';
 import { downloadThemeAndDataZip } from './utils/themeGenerator';
 import { LayoutDashboard, Download, Globe, ArrowUp } from 'lucide-react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 
 export default function App() {
   const [currentRoute, setCurrentRoute] = useState<string>('home');
@@ -443,6 +444,7 @@ export default function App() {
         />
       )}
 
+      <SpeedInsights />
     </div>
   );
 }
