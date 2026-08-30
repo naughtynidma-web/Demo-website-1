@@ -71,7 +71,30 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="bg-[#111827] text-gray-300 text-xs px-4 py-1 flex items-center justify-between border-b border-gray-800">
         <div className="flex items-center space-x-4">
           <button 
-
+            onClick={() => onOpenAdmin('dashboard')}
+            className="flex items-center space-x-1.5 text-blue-400 hover:text-white transition font-medium"
+            title="Open WordPress Admin"
+          >
+            <LayoutDashboard className="w-3.5 h-3.5" />
+            <span>WP Admin</span>
+          </button>
+          <span className="text-gray-600">|</span>
+          <button 
+            onClick={() => onOpenAdmin('new-post')}
+            className="flex items-center space-x-1 text-emerald-400 hover:text-white transition font-medium"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            <span>+ Add Post</span>
+          </button>
+          <span className="text-gray-600 hidden md:inline">|</span>
+          <button 
+            onClick={() => onOpenAdmin('customizer')}
+            className="hidden md:flex items-center space-x-1 text-amber-300 hover:text-white transition"
+          >
+            <SettingsIcon className="w-3.5 h-3.5" />
+            <span>Customizer</span>
+          </button>
+        </div>
         <div className="flex items-center space-x-3">
           <button
             onClick={onDownloadTheme}
