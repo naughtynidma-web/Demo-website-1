@@ -66,19 +66,50 @@ export const Header: React.FC<HeaderProps> = ({
   );
 
   return (
-  <header className="w-full select-none font-sans">
-    <div className="bg-white border-b border-gray-200 py-2 px-4 flex justify-between items-center text-xs text-gray-600">
-      <div className="flex items-center space-x-4">
-        <span className="font-bold text-red-600 uppercase tracking-widest">BUREAU</span>
-        <span className="hidden sm:inline">Islamabad • London • New York • Dubai</span>
+    <header className="w-full select-none font-sans">
+      {/* 1. Top WordPress Admin Bar (Dark) */}
+      <div className="bg-[#111827] text-gray-300 text-xs px-4 py-1 flex items-center justify-between border-b border-gray-800">
+        <div className="flex items-center space-x-4">
+          <button 
+
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={onDownloadTheme}
+            className="flex items-center space-x-1 bg-[#003366] hover:bg-[#004080] text-white px-2.5 py-0.5 rounded text-[11px] font-semibold transition"
+            title="Download complete WordPress Theme Package"
+          >
+            <Download className="w-3 h-3" />
+            <span>Download WP Theme</span>
+          </button>
+        </div>
       </div>
-      <div className="flex items-center space-x-4">
-        <span>{currentDate}</span>
-        <button onClick={onToggleLanguage} className="hover:text-black font-semibold cursor-pointer">
-          {language === 'ur' ? 'English' : 'اردو'}
-        </button>
+
+      {/* Top Utility Bar (Professional Dark Navy) */}
+      <div className="bg-[#002244] text-white text-[11px] px-4 md:px-6 py-1.5 flex justify-between items-center border-b border-[#003366]">
+        <div className="flex items-center gap-4">
+          <span className="font-bold uppercase tracking-widest text-red-400">Bureau</span>
+          <div className="hidden sm:inline-block overflow-hidden whitespace-nowrap opacity-90 text-[11px]">
+            <span>Islamabad • London • New York • Dubai</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 text-[11px]">
+          <span>{currentDate}</span>
+          <button 
+            onClick={onToggleLanguage}
+            className="cursor-pointer font-bold border-l border-white/20 pl-4 hover:text-blue-300 transition"
+          >
+            {language === 'ur' ? 'English' : 'اردو'}
+          </button>
+          <button
+            onClick={onToggleDarkMode}
+            className="border-l border-white/20 pl-3 text-slate-300 hover:text-white transition"
+            title="Toggle Dark Mode"
+          >
+            {darkMode ? <Sun className="w-3 h-3 text-amber-300" /> : <Moon className="w-3 h-3" />}
+          </button>
+        </div>
       </div>
-    </div>
 
       {/* Main Masthead with Centered DUNYA INTERNATIONAL Logo */}
       <div className="relative bg-white dark:bg-slate-900 px-4 md:px-6 py-4 border-b border-gray-200 dark:border-slate-800 shadow-xs transition-colors flex items-center justify-between min-h-[76px] md:min-h-[86px]">
@@ -349,6 +380,3 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
-
-
-
