@@ -18,6 +18,7 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
+  // If breaking posts are available, use their titles; otherwise fallback to customText or default breaking alerts
   const defaultAlerts = [
     'Pakistan Announces Strategic Economic Reforms Package and Digital Trade Framework',
     'Global Markets React to New International Trade and Energy Agreement',
@@ -102,4 +103,3 @@ export const BreakingTicker: React.FC<BreakingTickerProps> = ({
   );
 };
 
-export default BreakingTicker;
