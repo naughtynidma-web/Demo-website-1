@@ -1,105 +1,121 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronLeft, Pause, Play, Flame } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { WPPost } from '../types/wordpress';
 
-interface BreakingTickerProps {
+interface NewsTickerProps {
   posts: WPPost[];
-  customText?: string;
-  onNavigate: (route: string) => void;
-  speed?: number;
+  onSelectPost: (post: WPPost) => void;
+  speedMs?: number; // Slide interval speed in milliseconds (Default: 4000ms / 4s)
 }
 
-export const BreakingTicker: React.FC<BreakingTickerProps> = ({
+export const NewsTicker: React.FC<NewsTickerProps> = ({
   posts,
-  customText,
-  onNavigate,
-  speed = 6
+  onSelectPost,
+  speedMs = 4000
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [fadeState, setFadeState] = useState<'in' | 'out'>('in');
 
-  // If breaking posts are available, use their titles; otherwise fallback to customText or default breaking alerts
-  const defaultAlerts = [
-    'Pakistan Announces Strategic Economic Reforms Package and Digital Trade Framework',
-    'Global Markets React to New International Trade and Energy Agreement',
-    'Three Generations of Learning: The Gholam Mustafa–Mujtaba Family Legacy Featured Report'
-  ];
-
-  const items = posts.length > 0 
-    ? posts.map(p => ({ id: p.id, title: p.title, slug: p.slug, category: p.category }))
-    : customText 
-      ? [{ id: 'custom-1', title: customText, slug: '', category: 'Breaking' }]
-      : defaultAlerts.map((text, idx) => ({ id: `default-${idx}`, title: text, slug: idx === 2 ? 'three-generations-of-learning-the-gholam-mustafa-mujtaba-family-legacy' : '', category: 'Breaking' }));
+  // Filter breaking news posts or fallback to top posts
+  const tickerPosts = posts.filter(p => p.isBreaking || p.isFeatured).slice(0, 8);
+  const activePosts = tickerPosts.length > 0 ? tickerPosts : posts.slice(0, 5);
 
   useEffect(() => {
-    if (items.length <= 1 || isPaused) return;
+    if (isPaused || activePosts.length === 0) return;
+
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % items.length);
-    }, speed * 1000);
+      // Smooth fade out effect
+      setFadeState('out');
+
+      setTimeout(() => {
+        setCurrentIndex((prevIndex) => (prevIndex + 1) % activePosts.length);
+        setFadeState('in');
+      }, 300); // 300ms transition phase
+    }, speedMs);
+
     return () => clearInterval(interval);
-  }, [items.length, isPaused, speed]);
+  }, [isPaused, activePosts.length, speedMs]);
 
-  if (items.length === 0) return null;
+  if (activePosts.length === 0) return null;
 
-  const currentItem = items[currentIndex];
+  const currentPost = activePosts[currentIndex];
+
+  const handlePrev = () => {
+    setFadeState('out');
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev === 0 ? activePosts.length - 1 : prev - 1));
+      setFadeState('in');
+    }, 200);
+  };
+
+  const handleNext = () => {
+    setFadeState('out');
+    setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % activePosts.length);
+      setFadeState('in');
+    }, 200);
+  };
 
   return (
-    <div 
-      className="bg-[#002244] text-white text-[11px] px-4 md:px-6 py-1.5 flex justify-between items-center border-b border-[#003366] select-none"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-    >
-      <div className="flex items-center gap-3 md:gap-4 overflow-hidden flex-1">
-        <span className="bg-[#c00] text-white text-[9px] md:text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-xs shrink-0 flex items-center gap-1">
-          <Flame className="w-3 h-3 animate-pulse" />
-          <span>Breaking</span>
+    <div className="bg-[#0b1320] text-white flex items-center justify-between px-3 md:px-6 py-2 text-xs border-b border-slate-800 select-none">
+      <div className="flex items-center gap-3 overflow-hidden flex-1">
+        {/* Red Breaking Badge */}
+        <span className="bg-[#c00] text-white font-extrabold uppercase px-2.5 py-0.5 rounded-xs text-[10px] tracking-wider shrink-0 animate-pulse">
+          BREAKING
         </span>
 
-        <div className="overflow-hidden whitespace-nowrap italic opacity-95 flex-1 pr-4">
-          {currentItem.slug ? (
-            <button
-              onClick={() => onNavigate(`post:${currentItem.slug}`)}
-              className="text-white hover:text-amber-300 transition text-left truncate block w-full text-xs"
-            >
-              {currentItem.title}
-            </button>
-          ) : (
-            <span className="text-white text-xs truncate block">
-              {currentItem.title}
-            </span>
-          )}
+        {/* Sliding / Fading Text Container */}
+        <div 
+          className="overflow-hidden cursor-pointer flex-1"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onClick={() => onSelectPost(currentPost)}
+        >
+          <div 
+            className={`transition-all duration-300 transform ${
+              fadeState === 'in' 
+                ? 'opacity-100 translate-y-0' 
+                : 'opacity-0 -translate-y-2'
+            } font-medium text-slate-200 hover:text-white hover:underline truncate`}
+          >
+            {currentPost.title}
+          </div>
         </div>
       </div>
 
-      {items.length > 1 && (
-        <div className="flex items-center gap-1 shrink-0 text-white/70">
-          <button
-            onClick={() => setCurrentIndex((prev) => (prev - 1 + items.length) % items.length)}
-            className="p-0.5 hover:text-white transition"
-            title="Previous"
+      {/* Manual Slide Controls & Counter */}
+      <div className="flex items-center gap-2 text-slate-400 shrink-0 ml-3 text-[11px]">
+        <span>
+          <strong className="text-white">{currentIndex + 1}</strong>/{activePosts.length}
+        </span>
+        
+        <div className="flex items-center gap-1 border-l border-slate-700 pl-2">
+          <button 
+            onClick={handlePrev}
+            className="p-1 hover:text-white transition rounded hover:bg-slate-800"
+            title="Previous Story"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
           </button>
-          <button
+          
+          <button 
             onClick={() => setIsPaused(!isPaused)}
-            className="p-0.5 hover:text-white transition"
-            title={isPaused ? "Play" : "Pause"}
+            className="p-1 hover:text-white transition rounded hover:bg-slate-800"
+            title={isPaused ? "Play Auto-Slide" : "Pause Auto-Slide"}
           >
-            {isPaused ? <Play className="w-3 h-3 text-amber-300" /> : <Pause className="w-3 h-3" />}
+            {isPaused ? <Play className="w-3 h-3 text-emerald-400" /> : <Pause className="w-3 h-3" />}
           </button>
-          <button
-            onClick={() => setCurrentIndex((prev) => (prev + 1) % items.length)}
-            className="p-0.5 hover:text-white transition"
-            title="Next"
+
+          <button 
+            onClick={handleNext}
+            className="p-1 hover:text-white transition rounded hover:bg-slate-800"
+            title="Next Story"
           >
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
-          <span className="text-[10px] font-mono pl-1 text-white/50 hidden sm:inline">
-            {currentIndex + 1}/{items.length}
-          </span>
         </div>
-      )}
+      </div>
     </div>
   );
 };
-
